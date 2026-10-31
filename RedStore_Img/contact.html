@@ -1,0 +1,92 @@
+<!----------contact.html----------->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - RedStore</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- Navbar -->
+<div class="container">
+    <div class="navbar">
+        <div class="logo">
+            <a href="index.html"><img src="images/logo.png" width="125px"></a>
+        </div>
+        <nav>
+            <ul id="MenuItems">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="product.html">Products</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="contact.html" class="active-link">Contact</a></li>
+                <li><a href="account.html">Account</a></li>
+            </ul>
+        </nav>
+        <a href="cart.html" class="cart-icon">
+  <img src="images/cart.png" width="30px">
+  <span id="cart-count">0</span>
+</a>
+        <img src="images/menu.png" class="menu-icon" onclick="menutoggle()">
+    </div>
+</div>
+
+<!-- Contact Section -->
+<div class="contact-page">
+    <div class="container">
+        <h2 class="title">Contact Us</h2>
+
+        <div class="row">
+            <!-- Contact Info -->
+            <div class="col-2 contact-info">
+                <h3>Get in Touch</h3>
+                <p>We’d love to hear from you! Whether you have a question about products, pricing, or anything else.</p>
+
+                <p><strong>Email:</strong> support@redstore.com</p>
+                <p><strong>Phone:</strong> +91 98765 00000</p>
+                <p><strong>Location:</strong> Karnataka, India</p>
+            </div>
+
+            <!-- Contact Form -->
+            <div class="col-2">
+                <form class="contact-form" onsubmit="return showMessage()">
+                    <input type="text" placeholder="Your Name" required>
+                    <input type="email" placeholder="Your Email" required>
+                    <input type="text" placeholder="Subject">
+                    <textarea placeholder="Your Message" rows="5" required></textarea>
+                    <button type="submit" class="btn">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+    <div class="container">
+        <hr>
+        <p class="copyright">Copyright 2026 - Akshay Hegde</p>
+    </div>
+</div>
+
+<!-- JS -->
+<script>
+    var MenuItems = document.getElementById("MenuItems");
+    MenuItems.style.maxHeight = "0px";
+    function menutoggle(){
+        MenuItems.style.maxHeight =
+        MenuItems.style.maxHeight == "0px" ? "200px" : "0px";
+    }
+
+    function showMessage(){
+        alert("Thank you! Your message has been sent.");
+        return false;
+    }
+</script>
+
+</body>
+</html>

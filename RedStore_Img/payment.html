@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment - RedStore</title>
+
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ================= PAYMENT PAGE ONLY ================= */
+
+        .payment-container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 20px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .payment-container h2 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .payment-row {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .payment-box {
+            flex: 1;
+            background: #_toggleffffff;
+            padding: 20px;
+            border-radius: 6px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .payment-box h3 {
+            color: #ff523b;
+            margin-bottom: 15px;
+        }
+
+        /* Order table */
+        .payment-box table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .payment-box th {
+            background: #ff523b;
+            color: white;
+            padding: 10px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .payment-box td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .final-amount {
+            margin-top: 15px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        /* Payment options */
+        .payment-option {
+            display: grid;
+            grid-template-columns: 20px 1fr;
+            column-gap: 12px;
+            margin-bottom: 14px;
+            align-items: start;
+        }
+
+        .payment-option input[type="radio"] {
+            margin-top: 4px;
+        }
+
+        .payment-option label {
+            cursor: pointer;
+            line-height: 1.5;
+        }
+
+        /* Input fields */
+        .pay-fields {
+            margin-bottom: 12px;
+        }
+
+        .pay-fields input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        /* Buttons */
+        .pay-btn {
+            background: #ff523b;
+            color: white;
+            border: none;
+            padding: 10px 28px;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 12px;
+            margin-right: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .payment-row {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<script>
+    /* -------- LOGIN & CART CHECK -------- */
+    const user = JSON.parse(localStorage.getItem("loggedInUser"));
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+    if (!user) {
+        alert("Please login to continue");
+        window.location.href = "account.html";
+    }
+
+    if (cart.length === 0) {
+        alert("Your cart is empty");
+        window.location.href = "product.html";
+    }
+</script>
+
+<!---------- Navbar ---------->
+<div class="container">
+    <div class="navbar">
+        <div class="logo">
+            <a href="index.html">
+                <img src="images/logo.png" width="125px" alt="Logo">
+            </a>
+        </div>
+    </div>
+</div>
+
+<!---------- Payment Section ---------->
+<div class="payment-container">
+
+    <h2>Payment Details</h2>
+
+    <div class="payment-row">
+
+        <!-- Order Summary -->
+        <div class="payment-box">
+            <h3>Order Summary</h3>
+
+            <table id="summary-table">
+                <tr>
+                    <th>Product</th>
+                    <th>Qty</th>
+                    <th>Price</th>
+                </tr>
+            </table>
+
+            <div class="final-amount">
+                Total: <span id="final-total">$0.00</span>
+            </div>
+        </div>
+
+        <!-- Payment Form -->
+        <div class="payment-box">
+            <h3>Choose Payment Method</h3>
+
+            <form id="paymentForm">
+
+                <div class="payment-option">
+                    <input type="radio" name="payment" id="card" checked>
+                    <label for="card">Card Payment</label>
+                </div>
+
+                <div class="payment-option">
+                    <input type="radio" name="payment" id="upi">
+                    <label for="upi">UPI</label>
+                </div>
+
+                <div class="payment-option">
+                    <input type="radio" name="payment" id="cod">
+                    <label for="cod">Cash on Delivery</label>
+                </div>
+
+                <!-- Card Fields -->
+                <div class="pay-fields" id="cardFields">
+                    <input type="text" placeholder="Card Number" required>
+                    <input type="text" placeholder="Name on Card" required>
+                    <input type="text" placeholder="Expiry Date" required>
+                </div>
+
+                <!-- UPI Fields -->
+                <div class="pay-fields" id="upiFields" style="display:none;">
+                    <input type="text" placeholder="UPI ID">
+                </div>
+
+                <button type="submit" class="pay-btn">Pay Now</button>
+                <button type="button" class="pay-btn" onclick="history.back()">Back</button>
+
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<!---------- Footer ---------->
+<div class="footer">
+    <div class="container">
+        <hr>
+        <p class="copyright">
+            Copyright 2026 - Akshay Hegde
+        </p>
+    </div>
+</div>
+
+<script>
+    /* -------- ORDER SUMMARY -------- */
+    const table = document.getElementById("summary-table");
+    const totalEl = document.getElementById("final-total");
+
+    let total = 0;
+
+    cart.forEach(item => {
+        let itemTotal = item.price * item.quantity;
+        total += itemTotal;
+
+        let row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${item.name}</td>
+            <td>${item.quantity}</td>
+            <td>$${itemTotal.toFixed(2)}</td>
+        `;
+        table.appendChild(row);
+    });
+
+    totalEl.innerText = "$" + total.toFixed(2);
+
+    /* -------- PAYMENT FIELD TOGGLE -------- */
+    const cardRadio = document.getElementById("card");
+    const upiRadio = document.getElementById("upi");
+    const codRadio = document.getElementById("cod");
+
+    const cardFields = document.getElementById("cardFields");
+    const upiFields = document.getElementById("upiFields");
+
+    function toggleFields() {
+        if (cardRadio.checked) {
+            cardFields.style.display = "block";
+            upiFields.style.display = "none";
+        } else if (upiRadio.checked) {
+            cardFields.style.display = "none";
+            upiFields.style.display = "block";
+        } else {
+            cardFields.style.display = "none";
+            upiFields.style.display = "none";
+        }
+    }
+
+    document.querySelectorAll('input[name="payment"]').forEach(radio => {
+        radio.addEventListener("change", toggleFields);
+    });
+
+    toggleFields();
+
+    /* -------- PAYMENT SUBMIT -------- */
+    document.getElementById("paymentForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        alert("Payment successful! Order placed.");
+        localStorage.removeItem("cart");
+        window.location.href = "index.html";
+    });
+</script>
+
+</body>
+</html>

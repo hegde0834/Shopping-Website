@@ -1,0 +1,184 @@
+<!-------------- product.html -------------->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>All Products - RedStore</title>
+
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+
+<body class="product-page-bg">
+
+<!-- NAVBAR -->
+<div class="container">
+  <div class="navbar">
+    <div class="logo">
+      <a href="index.html"><img src="images/logo.png" width="125px"></a>
+    </div>
+
+    <nav>
+      <ul id="MenuItems">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="product.html" class="active-link">Products</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="account.html">Account</a></li>
+      </ul>
+    </nav>
+
+    <a href="cart.html" class="cart-icon">
+      <img src="images/cart.png" width="30px">
+      <span id="cart-count">0</span>
+    </a>
+
+    <img src="images/menu.png" class="menu-icon" onclick="menutoggle()">
+  </div>
+</div>
+
+<!-- PRODUCT CONTAINER -->
+<div class="small-container">
+
+<h2 class="title">All Products</h2>
+
+<!-- INLINE PRODUCT DETAILS -->
+<div id="product-details" style="display:none;">
+  <div class="row">
+    <div class="col-2">
+      <img id="detailImg" width="100%">
+    </div>
+
+    <div class="col-2">
+      <h1 id="detailName"></h1>
+      <h4 id="detailPrice"></h4>
+
+      <select id="detailSize">
+        <option value="">Select Size</option>
+        <option>S</option>
+        <option>M</option>
+        <option>L</option>
+        <option>XL</option>
+      </select>
+
+      <input type="number" id="detailQty" value="1" min="1">
+
+      <button class="btn" onclick="addDetailToCart()">Add To Cart</button>
+      <button class="btn btn-close" onclick="closeDetails()">Close</button>
+
+      <p id="detailDesc"></p>
+    </div>
+  </div>
+</div>
+
+<!-- PRODUCTS GRID -->
+<div class="row" id="product-list"></div>
+
+</div>
+
+<script>
+/* MENU */
+var MenuItems=document.getElementById("MenuItems");
+MenuItems.style.maxHeight="0px";
+function menutoggle(){
+ MenuItems.style.maxHeight =
+ MenuItems.style.maxHeight=="0px"?"200px":"0px";
+}
+
+/* PRODUCT DATA */
+const products=[
+ {n:"Red Printed T-Shirt",p:50,i:"images/product-1.jpg",d:"Cotton printed casual t-shirt"},
+ {n:"HRX AeroLite",p:58,i:"images/product-2.jpg",d:"Lightweight sports wear"},
+ {n:"Jogger Pant",p:40,i:"images/product-3.jpg",d:"Comfort fit jogger pant"},
+ {n:"Puma Polo T-Shirt",p:50,i:"images/product-4.jpg",d:"Premium polo t-shirt"},
+ {n:"Casual Shoe",p:55,i:"images/product-5.jpg",d:"Stylish casual footwear"},
+ {n:"Puma Men's T-shirt",p:55,i:"images/product-6.jpg",d:"Everyday comfort wear"},
+ {n:"HRX Socks",p:20,i:"images/product-7.jpg",d:"Soft cotton sports socks"},
+ {n:"Analog Black Watch",p:80,i:"images/product-8.jpg",d:"Classic analog watch"},
+ {n:"Black Yellow Watch",p:90,i:"images/product-9.jpg",d:"Modern sporty watch"},
+ {n:"HRX Sports Shoe",p:85,i:"images/product-10.jpg",d:"Running & training shoe"},
+ {n:"Light Weight Sneakers",p:70,i:"images/product-11.jpg",d:"Trendy sneakers"},
+ {n:"Nike Black Jogger",p:50,i:"images/product-12.jpg",d:"Athletic jogger pant"}
+];
+
+const list=document.getElementById("product-list");
+
+/* RENDER PRODUCTS */
+products.forEach(p=>{
+ list.innerHTML+=`
+ <div class="col-4 product-card">
+   <img src="${p.i}" onclick="openDetails('${p.n}',${p.p},'${p.i}','${p.d}')">
+   <h4>${p.n}</h4>
+   <p>$${p.p}.00</p>
+   <div class="rating">
+     <i class="fa fa-star"></i>
+     <i class="fa fa-star"></i>
+     <i class="fa fa-star"></i>
+     <i class="fa fa-star"></i>
+     <i class="fa fa-star-o"></i>
+   </div>
+   <button class="btn"
+    onclick="openDetails('${p.n}',${p.p},'${p.i}','${p.d}')">
+    View Product
+   </button>
+ </div>`;
+});
+
+/* PRODUCT DETAILS */
+let currentProduct={};
+
+function openDetails(name,price,image,desc){
+ document.getElementById("product-details").style.display="block";
+ detailName.innerText=name;
+ detailPrice.innerText="$"+price+".00";
+ detailImg.src=image;
+ detailDesc.innerText=desc;
+ detailQty.value=1;
+ detailSize.value="";
+ currentProduct={name,price,image};
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function closeDetails(){
+ document.getElementById("product-details").style.display="none";
+}
+
+/* ADD TO CART */
+function addDetailToCart(){
+ let size=detailSize.value;
+ let qty=Number(detailQty.value);
+
+ if(size===""){
+  alert("Please select size");
+  return;
+ }
+
+ let cart=JSON.parse(localStorage.getItem("cart"))||[];
+ let item=cart.find(i=>i.name===currentProduct.name && i.size===size);
+
+ if(item){
+  item.quantity+=qty;
+ }else{
+  cart.push({...currentProduct,size,quantity:qty});
+ }
+
+ localStorage.setItem("cart",JSON.stringify(cart));
+ updateCartCount();
+ alert("Product added to cart");
+}
+
+/* CART COUNT */
+function updateCartCount(){
+ let cart=JSON.parse(localStorage.getItem("cart"))||[];
+ let count=0;
+ cart.forEach(i=>count+=i.quantity);
+ document.getElementById("cart-count").innerText=count;
+}
+updateCartCount();
+</script>
+
+</body>
+</html>

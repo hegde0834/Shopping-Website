@@ -1,0 +1,212 @@
+<!------- cart.html --------->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Cart - RedStore</title>
+
+	<link rel="stylesheet" href="style.css">
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+
+<script>
+/* -------- LOGIN CHECK -------- */
+const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
+if(!loggedInUser){
+	alert("Please login to view your cart");
+	window.location.href = "account.html";
+}
+</script>
+
+<!---------- Navbar ---------->
+<div class="container">
+	<div class="navbar">
+		<div class="logo">
+			<a href="index.html">
+				<img src="images/logo.png" width="125px" alt="Logo">
+			</a>
+		</div>
+		<nav>
+			<ul id="MenuItems">
+				<li><a href="index.html">Home</a></li>
+				<li><a href="product.html">Products</a></li>
+				<li><a href="about.html">About</a></li>
+				<li><a href="contact.html">Contact</a></li>
+				<li><a href="account.html">Account</a></li>
+			</ul>
+		</nav>
+		<a href="cart.html" class="cart-icon">
+			<img src="images/cart.png" width="30px">
+			<span id="cart-count">0</span>
+		</a>
+		<img src="images/menu.png" class="menu-icon" onclick="menutoggle()">
+	</div>
+</div>
+
+<!---------- Cart Section ---------->
+<div class="small-container cart-page">
+
+	<table id="cart-table">
+		<tr>
+			<th>Product</th>
+			<th>Quantity</th>
+			<th>Subtotal</th>
+		</tr>
+	</table>
+
+	<p id="empty-cart-msg" style="text-align:center; display:none;">
+		Your cart is empty
+	</p>
+
+	<div class="total-price">
+		<table>
+			<tr>
+				<td>Subtotal</td>
+				<td id="subtotal">$0.00</td>
+			</tr>
+			<tr>
+				<td>Tax (10%)</td>
+				<td id="tax">$0.00</td>
+			</tr>
+			<tr>
+				<td>Total</td>
+				<td id="total">$0.00</td>
+			</tr>
+		</table>
+	</div>
+
+	<div class="buy-now-wrapper">
+		<a id="action-link" href="product.html">
+			<button id="action-btn" class="buy-now-btn">Continue Shopping</button>
+		</a>
+	</div>
+</div>
+
+<!---------- Footer ---------->
+<div class="footer">
+	<div class="container">
+		<hr>
+		<p class="copyright">
+			Copyright 2026 - Akshay Hegde
+		</p>
+	</div>
+</div>
+
+<script>
+/* -------- MENU TOGGLE -------- */
+var MenuItems = document.getElementById("MenuItems");
+MenuItems.style.maxHeight = "0px";
+function menutoggle(){
+	MenuItems.style.maxHeight =
+	MenuItems.style.maxHeight == "0px" ? "200px" : "0px";
+}
+
+/* -------- CART LOGIC -------- */
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+const cartTable = document.getElementById("cart-table");
+const subtotalEl = document.getElementById("subtotal");
+const taxEl = document.getElementById("tax");
+const totalEl = document.getElementById("total");
+const emptyMsg = document.getElementById("empty-cart-msg");
+const cartCount = document.getElementById("cart-count");
+const actionBtn = document.getElementById("action-btn");
+const actionLink = document.getElementById("action-link");
+
+function updateCartCount(){
+	let count = cart.reduce((sum,item)=> sum + item.quantity, 0);
+	cartCount.innerText = count;
+}
+
+function renderCart(){
+
+	cartTable.innerHTML = `
+	<tr>
+		<th>Product</th>
+		<th>Quantity</th>
+		<th>Subtotal</th>
+	</tr>`;
+
+	if(cart.length === 0){
+		emptyMsg.style.display = "block";
+		subtotalEl.innerText = "$0.00";
+		taxEl.innerText = "$0.00";
+		totalEl.innerText = "$0.00";
+
+		actionBtn.innerText = "Continue Shopping";
+		actionLink.href = "product.html";
+
+		updateCartCount();
+		return;
+	}
+
+	emptyMsg.style.display = "none";
+	let subtotal = 0;
+
+	cart.forEach((item,index)=>{
+		let itemTotal = item.price * item.quantity;
+		subtotal += itemTotal;
+
+		let row = document.createElement("tr");
+		row.innerHTML = `
+		<td>
+			<div class="cart-info">
+				<img src="${item.image}">
+				<div>
+					<p>${item.name}</p>
+					<small>Price: $${item.price}</small><br>
+					<a href="#" class="remove" data-index="${index}">Remove</a>
+				</div>
+			</div>
+		</td>
+		<td>
+			<input type="number" min="1" value="${item.quantity}"
+			       class="qty" data-index="${index}">
+		</td>
+		<td>$${itemTotal.toFixed(2)}</td>
+		`;
+		cartTable.appendChild(row);
+	});
+
+	let tax = subtotal * 0.10;
+	subtotalEl.innerText = "$" + subtotal.toFixed(2);
+	taxEl.innerText = "$" + tax.toFixed(2);
+	totalEl.innerText = "$" + (subtotal + tax).toFixed(2);
+
+	actionBtn.innerText = "Buy Now";
+	actionLink.href = "payment.html";
+
+	updateCartCount();
+	addEvents();
+}
+
+function addEvents(){
+
+	document.querySelectorAll(".qty").forEach(input=>{
+		input.addEventListener("change", e=>{
+			let i = e.target.dataset.index;
+			cart[i].quantity = parseInt(e.target.value);
+			localStorage.setItem("cart", JSON.stringify(cart));
+			renderCart();
+		});
+	});
+
+	document.querySelectorAll(".remove").forEach(btn=>{
+		btn.addEventListener("click", e=>{
+			e.preventDefault();
+			let i = e.target.dataset.index;
+			cart.splice(i,1);
+			localStorage.setItem("cart", JSON.stringify(cart));
+			renderCart();
+		});
+	});
+}
+
+renderCart();
+</script>
+
+</body>
+</html>
